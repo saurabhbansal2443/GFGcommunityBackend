@@ -104,7 +104,15 @@ let updateUser = async (req, res) => {
     return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
-    let updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, { new: true });
+    
+    let {password, ...rest } =  req.body ;
+
+    if(password ){
+      req.user.password = password ;
+      await req.user.save();
+    }
+    let updatedUser = await User.findByIdAndUpdate(req.user._id, rest , { new: true });
+  
     return res.status(200).send({ result: true, message: "User updated successfully", data: updatedUser });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
@@ -117,6 +125,7 @@ let logout = async (req, res) => {
     return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
+    
     await User.findByIdAndUpdate(req.user._id, { refreshToken: "" });
     res.clearCookie("AccessToken", cookieOptions);
     res.clearCookie("RefreshToken", cookieOptions);
