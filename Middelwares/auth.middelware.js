@@ -23,7 +23,7 @@ let auth = async (req, res, next) => {
     try {
       decodedAccessToken = jwt.verify(accessToken, process.env.ACCESS_KEY);
     } catch (err) {
-      console.log("accessToken is not present   or expired ", err);
+      console.log("accessToken is not present or expired ", err);
     }
     // decoding access token
     if (decodedAccessToken) {
@@ -55,7 +55,7 @@ let auth = async (req, res, next) => {
           .send({ result: false, message: "Unauthorized user" });
       }
       // genreating the new tokens
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =await user.generateToken();
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await user.generateToken();
       // updating the token in Database
       user.refreshToken = newRefreshToken;
       // saving the new user
@@ -71,5 +71,6 @@ let auth = async (req, res, next) => {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
+
 
 export default auth;

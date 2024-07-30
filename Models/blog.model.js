@@ -15,3 +15,10 @@ let blogSchema = new Schema(
 let Blog = model("Blog" , blogSchema);
 
 export default Blog;
+
+
+// createBlog 
+// updateBlog 
+// deleteBlog 
+// getAllBlog 
+// getBlogByUser 

@@ -1,4 +1,5 @@
 import User from "../Models/user.model.js";
+import uploadOnCloudinary from "../Utility/Cloudinary.js";
 
 let cookieOptions = {
   httpOnly: true,
@@ -134,6 +135,25 @@ let logout = async (req, res) => {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
-export { signup, login, updateUser, logout, getUser };
+
+let uplaodPhoto = async (req,res)=>{
+  if (!req.user) {
+    return res.status(401).send({ result: false, message: "User not authenticated" });
+  }
+  try{
+    let photDetails = await uploadOnCloudinary(req.file.path);
+    let photUrl = photDetails.url;  
+    
+    let updatedUser = await User.findByIdAndUpdate(req.user._id , {profilePicture : photUrl} , {new : true })
+    
+    return res.send({ result: true, message: "Photo Uploaded Successfully ", data : updatedUser})
+
+
+  }catch (err) {
+    return res.status(500).send({ result: false, message: err.message });
+  }
+}
+
+export { signup, login, updateUser, logout, getUser , uplaodPhoto };
 
 // signup login getuser updateuser logout

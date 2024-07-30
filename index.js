@@ -3,6 +3,7 @@ import "dotenv/config";
 import dbconnect from "./Database/dbConnect.js";
 import cookieParser from "cookie-parser";
 import userRouter from "./Routes/user.route.js"
+import blogRouter from "./Routes/blog.route.js"
 
 let server = express();
 
@@ -16,6 +17,7 @@ server.use(cookieParser());
 // Api Routes 
 
 server.use("/users" , userRouter);
+server.use("/blogs" , blogRouter);
 
 
 dbconnect()
