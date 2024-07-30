@@ -74,45 +74,95 @@ let deleteBlog = async (req, res) => {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
+
 // Nothing required 
 let getAllBlog = async (req, res) => {
+  // if (!req.user) {
+  //   return res.status(401).send({ result: false, message: "User not Authenticated" });
+  // }
   try {
-    let allBlogs = await Blog.find();
-    return res
-    .status(200)
-    .json({
+    let userID = req?.user?._id || "767e3267gjhdkjhewgfj";
+
+    let allBlogs = await Blog.aggregate([
+      {
+        $lookup: {
+          from: 'likes',
+          localField: '_id',
+          foreignField: 'blog',
+          as: 'likes'
+        }
+      },
+      {
+        $addFields: {
+          likeCount: { $size: '$likes' },
+          likedByUser: {
+            $in: [userID, '$likes.user']
+          }
+        }
+      },
+      {
+        $project: {
+          likes: 0  // Exclude the 'likes' array if you don't need it
+        }
+      }
+    ]);
+
+    return res.status(200).json({
       result: true,
-      message: "All Blogs ",
+      message: "All Blogs",
       data: allBlogs,
     });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
-// nothing required 
+
 let getBlogByUser = async (req, res) => {
   if (!req.user) {
-    return res
-      .status(401)
-      .send({ result: false, message: "User not Authenticated " });
+    return res.status(401).send({ result: false, message: "User not Authenticated" });
   }
   try {
-    let userID = req.user._id ;
-    let blogs = await Blog.find({user : userID });
+    let userID = req.user._id;
 
-    return res
-    .status(200)
-    .json({
+    let blogs = await Blog.aggregate([
+      {
+        $match: { user: userID }
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          localField: '_id',
+          foreignField: 'blog',
+          as: 'likes'
+        }
+      },
+      {
+        $addFields: {
+          likeCount: { $size: '$likes' },
+          likedByUser: {
+            $in: [userID, '$likes.user']
+          }
+        }
+      },
+      {
+        $project: {
+          likes: 0  // Exclude the 'likes' array if you don't need it
+        }
+      }
+    ]);
+
+    return res.status(200).json({
       result: true,
-      message: "All Blogs ",
+      message: "All Blogs by User",
       data: blogs,
     });
-    
 
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
+
+
 
 export { createBlog, updateBlog, deleteBlog, getAllBlog, getBlogByUser };
 // createBlog

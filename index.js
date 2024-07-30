@@ -4,6 +4,7 @@ import dbconnect from "./Database/dbConnect.js";
 import cookieParser from "cookie-parser";
 import userRouter from "./Routes/user.route.js"
 import blogRouter from "./Routes/blog.route.js"
+import likeRouter from "./Routes/like.route.js"
 
 let server = express();
 
@@ -18,6 +19,7 @@ server.use(cookieParser());
 
 server.use("/users" , userRouter);
 server.use("/blogs" , blogRouter);
+server.use("/likes" , likeRouter)
 
 
 dbconnect()

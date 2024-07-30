@@ -14,3 +14,8 @@ likeSchema.index({ user: 1, blog: 1 }, { unique: true });
 let Like = model('Like' , likeSchema);
 
 export default Like;
+
+// add/remove like 
+
+// post liked by user --- [ blogID , blogID ------]
+
