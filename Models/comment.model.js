@@ -17,3 +17,8 @@ commentSchema.index({ user: 1 });
 let Comment = model("Comment", commentSchema);
 
 export default Comment; 
+
+// addcomment 
+// deleteComment 
+// updateComment 
+// getCommentsbyBlogId 
