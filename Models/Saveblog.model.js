@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 let { Schema, model } = mongoose;
 
 let saveblogSchema = new Schema({
-    user : {type : Schema.Types.ObjectId, ref : "User" , unique : true},
-    blog : {type : Schema.Types.ObjectId, ref : "Blog" , unique: true},
+    user : {type : Schema.Types.ObjectId, ref : "User" , required  : true},
+    blog : {type : Schema.Types.ObjectId, ref : "Blog" , required : true},
 } , {timestamps : true }) 
 
 // Unique compound index to ensure that a user can only save the same blog once

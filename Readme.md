@@ -1,0 +1,2 @@
+- delete blog ( savedblog , likedblog , comment )
+- userBlog ( followedBy (no.) , followedTo (no.))

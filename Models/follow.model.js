@@ -4,8 +4,8 @@ let { Schema, model } = mongoose;
 
 let followSchema = new Schema(
   {
-    followedBy: { type: Schema.Types.ObjectId, ref: "User", require: true },
-    followedTo: { type: Schema.Types.ObjectId, ref: "User", require: true },
+    followedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    followedTo: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
