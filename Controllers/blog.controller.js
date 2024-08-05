@@ -1,4 +1,7 @@
 import Blog from "../Models/blog.model.js";
+import Like from "../Models/like.model.js";
+import Comment from "../Models/comment.model.js";
+import Saveblog from "../Models/Saveblog.model.js";
 
 let createBlog = async (req, res) => {
   if (!req.user) {
@@ -13,13 +16,11 @@ let createBlog = async (req, res) => {
 
     blogData = await blog.save();
 
-    return res
-      .status(200)
-      .json({
-        result: true,
-        message: "Blog posted succesfullly",
-        data: blogData,
-      });
+    return res.status(200).json({
+      result: true,
+      message: "Blog posted succesfullly",
+      data: blogData,
+    });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
@@ -34,17 +35,16 @@ let updateBlog = async (req, res) => {
   try {
     let id = req.user._id;
     let blogData = { ...req.body, user: id };
-    let blogId = blogData.id ;
+    let blogId = blogData.id;
 
-    let updatedBlog = await Blog.findByIdAndUpdate(blogId , blogData , {new : true });
-    return res
-      .status(200)
-      .json({
-        result: true,
-        message: "Blog updated succesfullly",
-        data: updatedBlog,
-      });
-
+    let updatedBlog = await Blog.findByIdAndUpdate(blogId, blogData, {
+      new: true,
+    });
+    return res.status(200).json({
+      result: true,
+      message: "Blog updated succesfullly",
+      data: updatedBlog,
+    });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
@@ -57,54 +57,53 @@ let deleteBlog = async (req, res) => {
       .send({ result: false, message: "User not Authenticated " });
   }
   try {
-
-    let blogId = req.body.id ;
+    let blogId = req.body.id;
 
     let deletedBlog = await Blog.findByIdAndDelete(blogId);
-    return res
-      .status(200)
-      .json({
-        result: true,
-        message: "Blog deleted succesfullly",
-        data: deletedBlog,
-      });
 
-
+    if (!deletedBlog) {
+      return res.status(404).send({ result: false, message: "Blog not found" });
+    }
+    let deletedComments = await Comment.deleteMany({ blog: blogId });
+    let deletedLikes = await Like.deleteMany({ blog: blogId });
+    let deleedSavedBlogs = await Saveblog.deleteMany({ blog: blogId });
+    return res.status(200).json({
+      result: true,
+      message: "Blog deleted succesfullly",
+      data: { deletedBlog, deletedComments, deleedSavedBlogs, deletedLikes },
+    });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
 
-// Nothing required 
+// Nothing required
 let getAllBlog = async (req, res) => {
-  // if (!req.user) {
-  //   return res.status(401).send({ result: false, message: "User not Authenticated" });
-  // }
   try {
     let userID = req?.user?._id || "767e3267gjhdkjhewgfj";
 
     let allBlogs = await Blog.aggregate([
       {
         $lookup: {
-          from: 'likes',
-          localField: '_id',
-          foreignField: 'blog',
-          as: 'likes'
-        }
+          from: "likes",
+          localField: "_id",
+          foreignField: "blog",
+          as: "likes",
+        },
       },
       {
         $addFields: {
-          likeCount: { $size: '$likes' },
+          likeCount: { $size: "$likes" },
           likedByUser: {
-            $in: [userID, '$likes.user']
-          }
-        }
+            $in: [userID, "$likes.user"],
+          },
+        },
       },
       {
         $project: {
-          likes: 0  // Exclude the 'likes' array if you don't need it
-        }
-      }
+          likes: 0, // Exclude the 'likes' array if you don't need it
+        },
+      },
     ]);
 
     return res.status(200).json({
@@ -119,36 +118,38 @@ let getAllBlog = async (req, res) => {
 
 let getBlogByUser = async (req, res) => {
   if (!req.user) {
-    return res.status(401).send({ result: false, message: "User not Authenticated" });
+    return res
+      .status(401)
+      .send({ result: false, message: "User not Authenticated" });
   }
   try {
     let userID = req.user._id;
 
     let blogs = await Blog.aggregate([
       {
-        $match: { user: userID }
+        $match: { user: userID },
       },
       {
         $lookup: {
-          from: 'likes',
-          localField: '_id',
-          foreignField: 'blog',
-          as: 'likes'
-        }
+          from: "likes",
+          localField: "_id",
+          foreignField: "blog",
+          as: "likes",
+        },
       },
       {
         $addFields: {
-          likeCount: { $size: '$likes' },
+          likeCount: { $size: "$likes" },
           likedByUser: {
-            $in: [userID, '$likes.user']
-          }
-        }
+            $in: [userID, "$likes.user"],
+          },
+        },
       },
       {
         $project: {
-          likes: 0  // Exclude the 'likes' array if you don't need it
-        }
-      }
+          likes: 0, // Exclude the 'likes' array if you don't need it
+        },
+      },
     ]);
 
     return res.status(200).json({
@@ -156,13 +157,10 @@ let getBlogByUser = async (req, res) => {
       message: "All Blogs by User",
       data: blogs,
     });
-
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
-
-
 
 export { createBlog, updateBlog, deleteBlog, getAllBlog, getBlogByUser };
 // createBlog
