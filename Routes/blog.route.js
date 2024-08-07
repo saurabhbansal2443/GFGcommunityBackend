@@ -7,7 +7,7 @@ Router
 .post("/create",auth, createBlog)
 .patch("/update" ,auth, updateBlog)
 .delete("/delete" ,auth, deleteBlog)
-.get("/" ,auth, getAllBlog)
+.get("/", getAllBlog)
 .get("/user" ,auth, getBlogByUser)
 
 export default Router   

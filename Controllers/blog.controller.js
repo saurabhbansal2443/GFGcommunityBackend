@@ -3,11 +3,10 @@ import Like from "../Models/like.model.js";
 import Comment from "../Models/comment.model.js";
 import Saveblog from "../Models/Saveblog.model.js";
 
+// Create a new blog
 let createBlog = async (req, res) => {
   if (!req.user) {
-    return res
-      .status(401)
-      .send({ result: false, message: "User not Authenticated " });
+    return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
     let id = req.user._id;
@@ -18,43 +17,40 @@ let createBlog = async (req, res) => {
 
     return res.status(200).json({
       result: true,
-      message: "Blog posted succesfullly",
+      message: "Blog posted successfully",
       data: blogData,
     });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
-// blogID will be given by frontend in the body ( id : blogID )
+
+// Update an existing blog
 let updateBlog = async (req, res) => {
   if (!req.user) {
-    return res
-      .status(401)
-      .send({ result: false, message: "User not Authenticated " });
+    return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
     let id = req.user._id;
     let blogData = { ...req.body, user: id };
     let blogId = blogData.id;
 
-    let updatedBlog = await Blog.findByIdAndUpdate(blogId, blogData, {
-      new: true,
-    });
+    let updatedBlog = await Blog.findByIdAndUpdate(blogId, blogData, { new: true });
+
     return res.status(200).json({
       result: true,
-      message: "Blog updated succesfullly",
+      message: "Blog updated successfully",
       data: updatedBlog,
     });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
-// blogID will be given by frontend in the body ( id : blogID )
+
+// Delete a blog
 let deleteBlog = async (req, res) => {
   if (!req.user) {
-    return res
-      .status(401)
-      .send({ result: false, message: "User not Authenticated " });
+    return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
     let blogId = req.body.id;
@@ -64,23 +60,25 @@ let deleteBlog = async (req, res) => {
     if (!deletedBlog) {
       return res.status(404).send({ result: false, message: "Blog not found" });
     }
+
     let deletedComments = await Comment.deleteMany({ blog: blogId });
     let deletedLikes = await Like.deleteMany({ blog: blogId });
-    let deleedSavedBlogs = await Saveblog.deleteMany({ blog: blogId });
+    let deletedSavedBlogs = await Saveblog.deleteMany({ blog: blogId });
+
     return res.status(200).json({
       result: true,
-      message: "Blog deleted succesfullly",
-      data: { deletedBlog, deletedComments, deleedSavedBlogs, deletedLikes },
+      message: "Blog deleted successfully",
+      data: { deletedBlog, deletedComments, deletedLikes, deletedSavedBlogs },
     });
   } catch (err) {
     return res.status(500).send({ result: false, message: err.message });
   }
 };
 
-// Nothing required
+// Get all blogs
 let getAllBlog = async (req, res) => {
   try {
-    let userID = req?.user?._id || "767e3267gjhdkjhewgfj";
+    let userID = req?.user?._id || null;
 
     let allBlogs = await Blog.aggregate([
       {
@@ -94,9 +92,7 @@ let getAllBlog = async (req, res) => {
       {
         $addFields: {
           likeCount: { $size: "$likes" },
-          likedByUser: {
-            $in: [userID, "$likes.user"],
-          },
+          likedByUser: userID ? { $in: [userID, "$likes.user"] } : false,
         },
       },
       {
@@ -116,11 +112,10 @@ let getAllBlog = async (req, res) => {
   }
 };
 
+// Get blogs by a specific user
 let getBlogByUser = async (req, res) => {
   if (!req.user) {
-    return res
-      .status(401)
-      .send({ result: false, message: "User not Authenticated" });
+    return res.status(401).send({ result: false, message: "User not authenticated" });
   }
   try {
     let userID = req.user._id;
@@ -140,9 +135,7 @@ let getBlogByUser = async (req, res) => {
       {
         $addFields: {
           likeCount: { $size: "$likes" },
-          likedByUser: {
-            $in: [userID, "$likes.user"],
-          },
+          likedByUser: { $in: [userID, "$likes.user"] },
         },
       },
       {
@@ -163,8 +156,3 @@ let getBlogByUser = async (req, res) => {
 };
 
 export { createBlog, updateBlog, deleteBlog, getAllBlog, getBlogByUser };
-// createBlog
-// updateBlog
-// deleteBlog
-// getAllBlog
-// getBlogByUser

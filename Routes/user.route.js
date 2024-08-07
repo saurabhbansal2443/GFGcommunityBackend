@@ -7,7 +7,7 @@ import {
   updateUser,
   logout,
   getUser,
-  uplaodPhoto
+  uploadPhoto
 } from "../Controllers/user.controller.js";
 let Router = express.Router();
 
@@ -18,7 +18,7 @@ Router
   .get("/",auth, getUser)
   .patch("/update",auth, updateUser)
   .post("/logout",auth,  logout)
-  .patch("/updatePicture" ,auth, upload.single("profilePicture") ,uplaodPhoto  )
+  .patch("/updatePicture" ,auth, upload.single("profilePicture") ,uploadPhoto  )
 
   export default Router;    
 
