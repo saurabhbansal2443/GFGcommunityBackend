@@ -14,7 +14,7 @@ let server = express();
 
 let port = process.env.PORT || 3000;
 server.use(cors({
-  origin : " http://localhost:5174/",
+  origin : "http://localhost:5174",
   credentials: true,
   }
 ))

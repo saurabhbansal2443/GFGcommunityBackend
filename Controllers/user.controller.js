@@ -22,7 +22,6 @@ let signup = async (req, res) => {
 
     if (user) {
       return res
-        .status(409)
         .send({ result: false, message: "User already exists" });
     }
 
@@ -55,7 +54,7 @@ let login = async (req, res) => {
 
     if (!user) {
       return res
-        .status(401)
+       
         .send({ result: false, message: "User not found" });
     }
 
@@ -81,11 +80,11 @@ let login = async (req, res) => {
         });
     } else {
       return res
-        .status(401)
+        
         .send({ result: false, message: "Email/password is incorrect" });
     }
   } catch (err) {
-    return res.status(500).send({ result: false, message: err.message });
+    return res.send({ result: false, message: err.message });
   }
 };
 
