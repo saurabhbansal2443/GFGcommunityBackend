@@ -2,6 +2,7 @@ import express from "express";
 import "dotenv/config";
 import dbconnect from "./Database/dbConnect.js";
 import cookieParser from "cookie-parser";
+import cors from "cors"
 import userRouter from "./Routes/user.route.js"
 import blogRouter from "./Routes/blog.route.js"
 import likeRouter from "./Routes/like.route.js"
@@ -12,7 +13,11 @@ import saveblogRouter  from "./Routes/saveblog.route.js"
 let server = express();
 
 let port = process.env.PORT || 3000;
-
+server.use(cors({
+  origin : " http://localhost:5174/",
+  credentials: true,
+  }
+))
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
